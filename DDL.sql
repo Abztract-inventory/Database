@@ -45,13 +45,14 @@ CREATE TABLE cat_product(
     id int identity (1,1) PRIMARY KEY,
     date_created datetime,
     date_modified datetime,
+    status bit,
     name varchar(100),
     units_name varchar(50),
     is_set bit,
-    status_id int NOT NULL REFERENCES cat_status
+    statusId int NOT NULL REFERENCES cat_status
 );
 
-CREATE INDEX cat_product_status_id ON cat_product(status_id);
+CREATE INDEX cat_product_statusId ON cat_product(statusId);
 
 CREATE TABLE tbl_attribute(
     id int identity (1,1) PRIMARY KEY,
@@ -65,21 +66,22 @@ CREATE TABLE rel_product_attribute(
     id int identity (1,1) PRIMARY KEY,
     date_created datetime,
     date_modified datetime,
-    product_id int NOT NULL REFERENCES cat_product,
-    attribute_id int NOT NULL REFERENCES tbl_attribute
+    productId int NOT NULL REFERENCES cat_product,
+    attributeId int NOT NULL REFERENCES tbl_attribute
 );
 
-CREATE INDEX rel_product_attribute_product_id ON rel_product_attribute(product_id);
-CREATE INDEX rel_product_attribute_attribute_id ON rel_product_attribute(attribute_id);
+CREATE INDEX rel_product_attribute_productId ON rel_product_attribute(productId);
+CREATE INDEX rel_product_attribute_attributeId ON rel_product_attribute(attributeId);
 
 CREATE TABLE tbl_product(
     id int identity (1,1) PRIMARY KEY,
     date_created datetime,
     date_modified datetime,
-    product_id int NOT NULL REFERENCES cat_product,
+    status bit,
+    productId int NOT NULL REFERENCES cat_product,
     document_number varchar(30),
     supplier_number varchar(30),
-    material_id int NOT NULL REFERENCES cat_material,
+    materialId int NOT NULL REFERENCES cat_material,
     quantity float,
     unit_value float,
     grammage float,
@@ -88,27 +90,28 @@ CREATE TABLE tbl_product(
     height float,
     is_printed bit,
     is_waxed bit,
-    company_id int NOT NULL REFERENCES cat_company,
+    companyId int NOT NULL REFERENCES cat_company,
     cost float,
-    currency_id int NOT NULL REFERENCES cat_currency,
+    currencyId int NOT NULL REFERENCES cat_currency,
     exchange_rate float,
     specific_attribute varchar(MAX),
-    manufacturer_id int NOT NULL REFERENCES cat_manufacturer
+    manufacturerId int NOT NULL REFERENCES cat_manufacturer
 );
 
-CREATE INDEX tbl_product_product_id ON tbl_product(product_id);
-CREATE INDEX tbl_product_material_id ON tbl_product(material_id);
-CREATE INDEX tbl_product_company_id ON tbl_product(company_id);
-CREATE INDEX tbl_product_currency_id ON tbl_product(currency_id);
-CREATE INDEX tbl_product_manufacturer_id ON tbl_product(manufacturer_id);
+CREATE INDEX tbl_product_productId ON tbl_product(productId);
+CREATE INDEX tbl_product_materialId ON tbl_product(materialId);
+CREATE INDEX tbl_product_companyId ON tbl_product(companyId);
+CREATE INDEX tbl_product_currencyId ON tbl_product(currencyId);
+CREATE INDEX tbl_product_manufacturerId ON tbl_product(manufacturerId);
 
 CREATE TABLE tbl_value(
     id int identity (1,1) PRIMARY KEY,
     date_created datetime,
     date_modified datetime,
-    attribute_id int NOT NULL REFERENCES tbl_attribute,
-    product_id int NOT NULL REFERENCES cat_product
+    value varchar(max),
+    attributeId int NOT NULL REFERENCES tbl_attribute,
+    productId int NOT NULL REFERENCES tbl_product
 );
 
-CREATE INDEX tbl_value_attribute_id ON tbl_value(attribute_id);
-CREATE INDEX tbl_value_product_id ON tbl_value(product_id);
+CREATE INDEX tbl_value_attributeId ON tbl_value(attributeId);
+CREATE INDEX tbl_value_productId ON tbl_value(productId);
