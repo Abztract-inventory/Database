@@ -46,23 +46,46 @@ GO
 
 ## 4. Configure hasura
 
-### Linking SQL Server Database
+### 4.1 Linking SQL Server Database
 
-4.1 On your browser travel to http://localhost:8080/ or wherever Hasura is hosted, go to the **_Data_** page.
+4.1.1 On your browser travel to http://localhost:8080/ or wherever Hasura is hosted, go to the **_Data_** page.
 
-4.2 Click on **_Connect Database_**.
+4.1.2 Click on **_Connect Database_**.
 
-4.3 Select **_MS SQL Server_**(or a similar option) and click on **_Connect Existing Database_**.
+4.1.3 Select **_MS SQL Server_**(or a similar option) and click on **_Connect Existing Database_**.
 
-4.4 Enter a **_Database name_** such as `"MSSQL_DB"`.
+4.1.4 Enter a **_Database name_** such as `"MSSQL_DB"`.
 
-4.5 Select the **_Database URL_** option and type:
+4.1.5 Select the **_Database URL_** option and type:
 
 > DRIVER={ODBC Driver 17 for SQL Server};SERVER=host.docker.internal,1433;DATABASE=abztract;UID=sa;PWD=Admin_2024
 
-4.6 Finally, click on **_Connect Database_** and it should connect.
+4.1.6 Click on **_Connect Database_** and it should connect.
 
-## 5. Go API
+### 4.2 Expose all the tables over the GraphQL API
+
+4.2.1 Go to the **_Data_** page.
+
+4.2.2 On the left side bar, **_select the database_** which was **previously added**.
+
+4.2.4 Click on the **_View_** button.
+
+4.2.3 Finally, click on the **_Track all_** button and then click on the **_ok_** button in the popup window.
+
+### 5 Query the API
+
+You can test the API by executing a query on the Hasura console. For example, to query the `cat_company` table:
+
+```
+query MyQuery {
+  cat_company {
+    name
+    id
+  }
+}
+```
+
+## 6. Go API
 
 The setup and configuration for the Go API is handled in a separate repository. Please follow the instructions in that repository to set up the Go API and link it to Hasura.
 
