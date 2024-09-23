@@ -49,6 +49,7 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
 
 --update
 CREATE OR ALTER PROCEDURE [dbo].[update_tbl_attribute]
@@ -106,6 +107,7 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
 
 --delete
 CREATE OR ALTER PROCEDURE [dbo].[delete_tbl_attribute]
@@ -154,3 +156,4 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO

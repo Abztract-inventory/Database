@@ -54,6 +54,7 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
 
 --update
 CREATE OR ALTER PROCEDURE [dbo].[update_cat_product]
@@ -123,6 +124,7 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
 
 --delete
 CREATE OR ALTER PROCEDURE [dbo].[delete_cat_product]
@@ -171,3 +173,4 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
