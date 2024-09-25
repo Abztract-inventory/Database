@@ -1,4 +1,8 @@
 CREATE DATABASE abztract;
+GO 
+
+USE abztract;
+GO
 
 -- CREATE TABLE gen(
 --     id int identity (1,1) PRIMARY KEY,

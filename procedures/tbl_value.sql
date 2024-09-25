@@ -56,6 +56,7 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
 
 --update
 CREATE OR ALTER PROCEDURE [dbo].[update_tbl_value]
@@ -93,9 +94,9 @@ BEGIN
                     UPDATE 
                         tbl_value
                     SET
-                        value = @value,
-                        productId = @productId,
-                        attributeId = @attributeId,
+                        value = case when @value is null then value else @value end,
+                        productId = case when @productId is null then productId else @productId end,
+                        attributeId = case when @attributeId is null then attributeId else @attributeId end,
                         date_modified = GETDATE()
                     WHERE 
                         id = @valueId
@@ -121,6 +122,7 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
 
 --delete
 CREATE OR ALTER PROCEDURE [dbo].[delete_tbl_value]
@@ -169,3 +171,4 @@ BEGIN
         SELECT 0 affects_rows, @message error, null id;
     END CATCH
 END
+GO
