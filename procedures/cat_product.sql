@@ -96,10 +96,10 @@ BEGIN
                         cat_product
                     SET
                         date_modified = GETDATE(),
-                        name = @name,
-                        units_name = @units_name,
-                        is_set = @is_set,
-                        statusId = @statusId
+                        name = case when @name is null then name else @name end,
+                        units_name = case when @units_name is null then units_name else @units_name end,
+                        is_set = case when @is_set is null then is_set else @is_set end,
+                        statusId = case when @statusId is null then statusId else @statusId end
                     WHERE 
                         id = @productId
                     SELECT 1 affects_rows, null error, @idOut id;

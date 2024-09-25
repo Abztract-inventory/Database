@@ -80,8 +80,8 @@ BEGIN
                     UPDATE 
                         tbl_attribute
                     SET
-                        key_name = @key_name,
-                        type = @type,
+                        key_name = case when @key_name is null then key_name else @key_name end,
+                        type = case when @type is null then type else @type end,
                         date_modified = GETDATE()
                     WHERE 
                         id = @attributeId
