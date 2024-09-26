@@ -1,108 +1,109 @@
+--rel_product_attribute.sql
 --create
-CREATE OR ALTER PROCEDURE [dbo].[create_rel_product_attribute]
+CREATE OR ALTER PROCEDURE [dbo].[createRelProductAttribute]
     @productId int, --cat_product
     @attributeId int,
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [create_rel_product_attribute];
-            declare @errores varchar(max);
-            declare @id table(id int);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [createRelProductAttribute];
+            DECLARE @errors varchar(max);
+            DECLARE @id TABLE(id int);
 
-            IF EXISTS(select id from rel_product_attribute where productId = @productId AND attributeId = @attributeId)
-                set @errores = concat(@errores, 'Relacion ya registrada: ', char(13), char(10));
+            IF EXISTS(SELECT id FROM rel_product_attribute WHERE productId = @productId AND attributeId = @attributeId)
+                SET @errors = CONCAT(@errors, 'Relación ya registrada.', CHAR(13), CHAR(10));
 
-            IF (@productId IS NOT NULL) AND NOT EXISTS(select id from cat_product where id = @productId)
-                set @errores = concat(@errores, 'Catalogo de prodcuto no encontrado: ', char(13), char(10));
-            
-            IF (@attributeId IS NOT NULL) AND NOT EXISTS(select id from tbl_attribute where id = @attributeId)
-                set @errores = concat(@errores, 'Atributo no encontrado: ', char(13), char(10));
+            IF (@productId IS NOT NULL) AND NOT EXISTS(SELECT id FROM cat_product WHERE id = @productId)
+                SET @errors = CONCAT(@errors, 'Catálogo de producto no encontrado.', CHAR(13), CHAR(10));
+                
+            IF (@attributeId IS NOT NULL) AND NOT EXISTS(SELECT id FROM tbl_attribute WHERE id = @attributeId)
+                SET @errors = CONCAT(@errors, 'Atributo no encontrado.', CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     INSERT INTO 
-                        rel_product_attribute(date_created, date_modified, productId, attributeId)
-                    output inserted.id into @id
+                        rel_product_attribute(dateCreated, dateModified, productId, attributeId)
+                    OUTPUT inserted.id INTO @id
                     VALUES 
                         (GETDATE(), GETDATE(), @productId, @attributeId)
-                    select TOP 1 @idOut = id from @id
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT TOP 1 @idOut = id FROM @id
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [create_rel_product_attribute];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [createRelProductAttribute];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO
 
 --delete
-CREATE OR ALTER PROCEDURE [dbo].[delete_rel_product_attribute]
+CREATE OR ALTER PROCEDURE [dbo].[deleteRelProductAttribute]
     @productId int,
     @attributeId int,
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [delete_rel_product_attribute];
-            declare @errores varchar(max);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [deleteRelProductAttribute];
+            DECLARE @errors varchar(max);
 
-            IF NOT EXISTS(select id from rel_product_attribute where productId = @productId AND attributeId = @attributeId)
-                set @errores = concat(@errores, 'Relacion no encontrada: ', char(13), char(10));
+            IF NOT EXISTS(SELECT id FROM rel_product_attribute WHERE productId = @productId AND attributeId = @attributeId)
+                SET @errors = CONCAT(@errors, 'Relación no encontrada.', CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     DELETE FROM
                         rel_product_attribute
                     WHERE  
                         productId = @productId AND attributeId = @attributeId
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [delete_rel_product_attribute];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [deleteRelProductAttribute];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO

@@ -1,159 +1,160 @@
+--tbl_attribute.sql
 --create
-CREATE OR ALTER PROCEDURE [dbo].[create_tbl_attribute]
-    @key_name varchar(100),
+CREATE OR ALTER PROCEDURE [dbo].[createTblAttribute]
+    @keyName varchar(100),
     @type varchar(20),
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [create_tbl_attribute];
-            declare @errores varchar(max);
-            declare @id table(id int);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [createTblAttribute];
+            DECLARE @errors varchar(max);
+            DECLARE @id TABLE(id int);
 
-            IF EXISTS(select id from tbl_attribute where key_name = @key_name AND type = @type)
-                set @errores = concat(@errores, 'Atributo ya registrado: ', char(13), char(10));
+            IF EXISTS(SELECT id FROM tbl_attribute WHERE keyName = @keyName AND type = @type)
+                SET @errors = CONCAT(@errors, 'Atributo ya registrado.', CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     INSERT INTO 
-                        tbl_attribute(date_created, date_modified, key_name, type)
-                    output inserted.id into @id
+                        tbl_attribute(dateCreated, dateModified, keyName, type)
+                    OUTPUT inserted.id INTO @id
                     VALUES 
-                        (GETDATE(), GETDATE(), @key_name, @type)
-                    select TOP 1 @idOut = id from @id
-                    SELECT 1 affects_rows, null error, @idOut id;
+                        (GETDATE(), GETDATE(), @keyName, @type)
+                    SELECT TOP 1 @idOut = id FROM @id
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [create_tbl_attribute];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [createTblAttribute];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO
 
 --update
-CREATE OR ALTER PROCEDURE [dbo].[update_tbl_attribute]
+CREATE OR ALTER PROCEDURE [dbo].[updateTblAttribute]
     @attributeId int,
-    @key_name varchar(100),
+    @keyName varchar(100),
     @type varchar(20),
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [update_tbl_attribute];
-            declare @errores varchar(max);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [updateTblAttribute];
+            DECLARE @errors varchar(max);
 
-            IF NOT EXISTS(select id from tbl_attribute where id = @attributeId)
-                set @errores = concat(@errores, 'Atributo no encontrado, id: ', @attributeId, char(13), char(10));
+            IF NOT EXISTS(SELECT id FROM tbl_attribute WHERE id = @attributeId)
+                SET @errors = CONCAT(@errors, 'Atributo no encontrado, id: ', @attributeId, CHAR(13), CHAR(10));
 
-            ELSE IF EXISTS(select id from tbl_attribute where key_name = @key_name AND type = @type)
-                set @errores = concat(@errores, 'Atributo ya registrado, key_name: ', @key_name, ', type: ', @type, char(13), char(10));
+            ELSE IF EXISTS(SELECT id FROM tbl_attribute WHERE keyName = @keyName AND type = @type)
+                SET @errors = CONCAT(@errors, 'Atributo ya registrado, keyName: ', @keyName, ', type: ', @type, CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     UPDATE 
                         tbl_attribute
                     SET
-                        key_name = case when @key_name is null then key_name else @key_name end,
-                        type = case when @type is null then type else @type end,
-                        date_modified = GETDATE()
+                        keyName = COALESCE(@keyName, keyName),
+                        type = COALESCE(@type, type),
+                        dateModified = GETDATE()
                     WHERE 
                         id = @attributeId
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [update_tbl_attribute];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [updateTblAttribute];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO
 
 --delete
-CREATE OR ALTER PROCEDURE [dbo].[delete_tbl_attribute]
+CREATE OR ALTER PROCEDURE [dbo].[deleteTblAttribute]
     @attributeId int,
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [delete_tbl_attribute];
-            declare @errores varchar(max);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [deleteTblAttribute];
+            DECLARE @errors varchar(max);
 
-            IF NOT EXISTS(select id from tbl_attribute where id = @attributeId)
-                set @errores = concat(@errores, 'Atributo no encontrado: ', @attributeId, char(13), char(10));
+            IF NOT EXISTS(SELECT id FROM tbl_attribute WHERE id = @attributeId)
+                SET @errors = CONCAT(@errors, 'Atributo no encontrado: ', @attributeId, CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     DELETE FROM
                         tbl_attribute
                     WHERE  
                         id = @attributeId
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [delete_tbl_attribute];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [deleteTblAttribute];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO

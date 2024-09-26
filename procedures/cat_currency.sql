@@ -1,161 +1,162 @@
+--cat_currency.sql
 --create
-CREATE OR ALTER PROCEDURE [dbo].[create_cat_currency]
+CREATE OR ALTER PROCEDURE [dbo].[createCatCurrency]
     @currencyName varchar(100),
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [create_cat_currency];
-            declare @errores varchar(max);
-            declare @id table(id int);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [createCatCurrency];
+            DECLARE @errors varchar(max);
+            DECLARE @id TABLE(id int);
 
-            IF EXISTS(select id from cat_currency where name = @currencyName)
-                set @errores = concat(@errores, 'Tipo de cambio ya registrado: ', @currencyName, char(13), char(10));
+            IF EXISTS(SELECT id FROM cat_currency WHERE name = @currencyName)
+                SET @errors = CONCAT(@errors, 'Tipo de cambio ya registrado: ', @currencyName, CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     INSERT INTO 
-                        cat_currency(date_created, date_modified, name)
-                    output inserted.id into @id
+                        cat_currency(dateCreated, dateModified, name)
+                    OUTPUT inserted.id INTO @id
                     VALUES 
                         (GETDATE(), GETDATE(), @currencyName)
-                    select TOP 1 @idOut = id from @id
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT TOP 1 @idOut = id FROM @id
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [create_cat_currency];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [createCatCurrency];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO
 
 --update
-CREATE OR ALTER PROCEDURE [dbo].[update_cat_currency]
+CREATE OR ALTER PROCEDURE [dbo].[updateCatCurrency]
     @currencyId int,
     @currencyName varchar(100),
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [update_cat_currency];
-            declare @errores varchar(max);
-            declare @currentName varchar(100);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [updateCatCurrency];
+            DECLARE @errors varchar(max);
+            DECLARE @currentName varchar(100);
             SELECT @currentName = name FROM cat_currency WHERE id = @currencyId
 
-            IF NOT EXISTS(select id from cat_currency where id = @currencyId)
-                set @errores = concat(@errores, 'Tipo de cambio no encontrado: ', @currencyName, char(13), char(10));
+            IF NOT EXISTS(SELECT id FROM cat_currency WHERE id = @currencyId)
+                SET @errors = CONCAT(@errors, 'Tipo de cambio no encontrado: ', @currencyName, CHAR(13), CHAR(10));
 
             ELSE IF (@currentName = @currencyName)
-                set @errores = concat(@errores, 'El nombre no puede ser el mismo: ', @currencyName, char(13), char(10));
+                SET @errors = CONCAT(@errors, 'El nombre no puede ser el mismo: ', @currencyName, CHAR(13), CHAR(10));
 
-            ELSE IF (@currentName <> @currencyName) AND EXISTS(select name from cat_currency where name = @currencyName)
-                set @errores = concat(@errores, 'Tipo de cambio ya registrado: ', @currencyName, char(13), char(10));
+            ELSE IF (@currentName <> @currencyName) AND EXISTS(SELECT name FROM cat_currency WHERE name = @currencyName)
+                SET @errors = CONCAT(@errors, 'Tipo de cambio ya registrado: ', @currencyName, CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     UPDATE 
                         cat_currency
                     SET
                         name = @currencyName,
-                        date_modified = GETDATE()
+                        dateModified = GETDATE()
                     WHERE 
                         id = @currencyId
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [update_cat_currency];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [updateCatCurrency];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO
 
 --delete
-CREATE OR ALTER PROCEDURE [dbo].[delete_cat_currency]
+CREATE OR ALTER PROCEDURE [dbo].[deleteCatCurrency]
     @currencyId int,
-    @idOut int = null output
+    @idOut int = NULL OUTPUT
 AS
-    set nocount on;
-    declare @trancount int;
-    set @trancount = @@trancount;
+    SET NOCOUNT ON;
+    DECLARE @tranCount int;
+    SET @tranCount = @@TRANCOUNT;
 BEGIN
     BEGIN TRY
-        if @trancount = 0
-            begin transaction
-        else
-            save transaction [delete_cat_currency];
-            declare @errores varchar(max);
+        IF @tranCount = 0
+            BEGIN TRANSACTION
+        ELSE
+            SAVE TRANSACTION [deleteCatCurrency];
+            DECLARE @errors varchar(max);
 
-            IF NOT EXISTS(select id from cat_currency where id = @currencyId)
-                set @errores = concat(@errores, 'Tipo de cambio no encontrado: ', @currencyId, char(13), char(10));
+            IF NOT EXISTS(SELECT id FROM cat_currency WHERE id = @currencyId)
+                SET @errors = CONCAT(@errors, 'Tipo de cambio no encontrado: ', @currencyId, CHAR(13), CHAR(10));
 
-            IF(@errores is null)
+            IF(@errors IS NULL)
                 BEGIN
                     DELETE FROM
                         cat_currency
                     WHERE  
                         id = @currencyId
-                    SELECT 1 affects_rows, null error, @idOut id;
+                    SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
             ELSE
                 BEGIN
-                    SELECT 0 affects_rows, @errores error, @idOut id;
+                    SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
                 END
         lbexit:
-            if @trancount = 0
-                commit;
+            IF @tranCount = 0
+                COMMIT;
     END TRY
     BEGIN CATCH
-        declare @error int, @message varchar(4000), @xstate int;
-        select @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
-        if @xstate = -1
-            rollback;
-        if @xstate = 1
-            rollback
-        if @xstate = 1 and @trancount > 0
-            rollback transaction [delete_cat_currency];
-        SELECT 0 affects_rows, @message error, null id;
+        DECLARE @error int, @message varchar(4000), @xstate int;
+        SELECT @error = ERROR_NUMBER(), @message = ERROR_MESSAGE(), @xstate = XACT_STATE();
+        IF @xstate = -1
+            ROLLBACK;
+        IF @xstate = 1
+            ROLLBACK;
+        IF @xstate = 1 AND @tranCount > 0
+            ROLLBACK TRANSACTION [deleteCatCurrency];
+        SELECT 0 AS affects_rows, @message AS error, NULL AS id;
     END CATCH
 END
 GO
