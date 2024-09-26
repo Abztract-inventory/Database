@@ -85,9 +85,9 @@ BEGIN
             IF (@attributeId IS NOT NULL) AND NOT EXISTS(select id from tbl_attribute where id = @attributeId)
                 set @errores = concat(@errores, 'Atributo no encontrado: ', char(13), char(10));
 
-            ELSE IF EXISTS(select id from tbl_value where productId = @productId AND attributeId = @attributeId)
+            ELSE IF EXISTS(select id from tbl_value where value = @value AND productId = @productId AND attributeId = @attributeId)
                 set @errores = concat(@errores, 'Valor ya registrado: ', char(13), char(10));
-
+                
             IF(@errores is null)
                 BEGIN
                     UPDATE 
