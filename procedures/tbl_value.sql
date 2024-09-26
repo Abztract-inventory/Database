@@ -17,7 +17,7 @@ BEGIN
             declare @errores varchar(max);
             declare @id table(id int);
 
-            IF EXISTS(select id from tbl_value where value = @value AND productId = @productId AND attributeId = @attributeId)
+            IF EXISTS(select id from tbl_value where productId = @productId AND attributeId = @attributeId)
                 set @errores = concat(@errores, 'Valor ya registrado: ', char(13), char(10));
 
             IF (@productId IS NOT NULL) AND NOT EXISTS(select id from tbl_product where id = @productId)
@@ -60,7 +60,6 @@ GO
 
 --update
 CREATE OR ALTER PROCEDURE [dbo].[update_tbl_value]
-    @valueId int,
     @value varchar(max),
     @productId int,
     @attributeId int,
@@ -77,8 +76,8 @@ BEGIN
             save transaction [update_tbl_value];
             declare @errores varchar(max);
 
-            IF NOT EXISTS(select id from tbl_value where id = @valueId)
-                set @errores = concat(@errores, 'Atributo no encontrado, id: ', @valueId, char(13), char(10));
+            IF NOT EXISTS(select id from tbl_value where productId = @productId AND attributeId = @attributeId)
+                set @errores = concat(@errores, 'Valor no encontrado: ', @productId, @attributeId, char(13), char(10));
 
             IF (@productId IS NOT NULL) AND NOT EXISTS(select id from tbl_product where id = @productId)
                 set @errores = concat(@errores, 'Prodcuto no encontrado: ', char(13), char(10));
@@ -86,7 +85,7 @@ BEGIN
             IF (@attributeId IS NOT NULL) AND NOT EXISTS(select id from tbl_attribute where id = @attributeId)
                 set @errores = concat(@errores, 'Atributo no encontrado: ', char(13), char(10));
 
-            ELSE IF EXISTS(select id from tbl_value where value = @value AND productId = @productId AND attributeId = @attributeId)
+            ELSE IF EXISTS(select id from tbl_value where productId = @productId AND attributeId = @attributeId)
                 set @errores = concat(@errores, 'Valor ya registrado: ', char(13), char(10));
 
             IF(@errores is null)
@@ -99,7 +98,7 @@ BEGIN
                         attributeId = case when @attributeId is null then attributeId else @attributeId end,
                         date_modified = GETDATE()
                     WHERE 
-                        id = @valueId
+                        productId = @productId AND attributeId = @attributeId
                     SELECT 1 affects_rows, null error, @idOut id;
                 END
             ELSE
@@ -126,7 +125,8 @@ GO
 
 --delete
 CREATE OR ALTER PROCEDURE [dbo].[delete_tbl_value]
-    @valueId int,
+    @productId int,
+    @attributeId int,
     @idOut int = null output
 AS
     set nocount on;
@@ -140,15 +140,21 @@ BEGIN
             save transaction [delete_tbl_value];
             declare @errores varchar(max);
 
-            IF NOT EXISTS(select id from tbl_value where id = @valueId)
-                set @errores = concat(@errores, 'Valor no encontrado: ', @valueId, char(13), char(10));
+            IF (@productId IS NOT NULL) AND NOT EXISTS(select id from tbl_product where id = @productId)
+                set @errores = concat(@errores, 'Prodcuto no encontrado: ', char(13), char(10));
+            
+            IF (@attributeId IS NOT NULL) AND NOT EXISTS(select id from tbl_attribute where id = @attributeId)
+                set @errores = concat(@errores, 'Atributo no encontrado: ', char(13), char(10));
+
+            IF NOT EXISTS(select id from tbl_value where productId = @productId AND attributeId = @attributeId)
+                set @errores = concat(@errores, 'Valor no encontrado: ', @productId, @attributeId, char(13), char(10));
 
             IF(@errores is null)
                 BEGIN
                     DELETE FROM
                         tbl_value
                     WHERE  
-                        id = @valueId
+                        productId = @productId AND attributeId = @attributeId
                     SELECT 1 affects_rows, null error, @idOut id;
                 END
             ELSE
