@@ -14,7 +14,7 @@ Run the PostgreSQL, SQL Server, and Hasura containers using the following comman
 
 `docker run -d --name sql_server -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Admin_2024' -p 1433:1433 --network hasura-network mcr.microsoft.com/mssql/server`
 
-`docker run -d --name hasura -p 8080:8080 -e HASURA_GRAPHQL_DATABASE_URL=postgres://hasura:hasura@host.docker.internal:5432/hasura -e HASURA_GRAPHQL_ENABLE_CONSOLE=true --network hasura-network hasura/graphql-engine`
+`docker run -d --name hasura -p 8080:8080 -e HASURA_GRAPHQL_DATABASE_URL=postgres://hasura:hasura@postgres:5432/hasura -e HASURA_GRAPHQL_ENABLE_CONSOLE=true --network hasura-network hasura/graphql-engine`
 
 ## 3 Create the database
 
@@ -58,7 +58,7 @@ GO
 
 4.1.5 Select the **_Database URL_** option and type:
 
-> DRIVER={ODBC Driver 17 for SQL Server};SERVER=host.docker.internal,1433;DATABASE=abztract;UID=sa;PWD=Admin_2024
+> DRIVER={ODBC Driver 17 for SQL Server};SERVER=sql_server,1433;DATABASE=abztract;UID=sa;PWD=Admin_2024
 
 4.1.6 Click on **_Connect Database_** and it should connect.
 
