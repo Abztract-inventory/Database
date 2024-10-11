@@ -1,6 +1,7 @@
 --cat_product.sql
 --create
 CREATE OR ALTER PROCEDURE [dbo].[create_cat_product]
+    @status bit,
     @name varchar(100),
     @unitsName varchar(50),
     @isSet bit,
@@ -28,10 +29,10 @@ BEGIN
             IF(@errors IS NULL)
                 BEGIN
                     INSERT INTO 
-                        cat_product(dateCreated, dateModified, name, unitsName, isSet, statusId)
+                        cat_product(dateCreated, dateModified, name, unitsName, isSet, statusId, status)
                     OUTPUT inserted.id INTO @id
                     VALUES 
-                        (GETDATE(), GETDATE(), @name, @unitsName, @isSet, @statusId)
+                        (GETDATE(), GETDATE(), @name, @unitsName, @isSet, @statusId, @status)
                     SELECT TOP 1 @idOut = id FROM @id
                     SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
                 END
@@ -148,8 +149,10 @@ BEGIN
 
             IF(@errors IS NULL)
                 BEGIN
-                    DELETE FROM
+                    UPDATE
                         cat_product
+                    SET
+                        status = 0
                     WHERE  
                         id = @productId
                     SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
