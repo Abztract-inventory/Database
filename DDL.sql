@@ -121,13 +121,13 @@ CREATE TABLE tbl_value(
 CREATE INDEX tbl_value_attributeId ON tbl_value(attributeId);
 CREATE INDEX tbl_value_productId ON tbl_value(productId);
 
-CREATE TABLE tbl_devices(
+CREATE TABLE tbl_printers(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    ip varchar(15),
-    model varchar(20),
+    ip varchar(15) NOT NULL,
+    model varchar(20) NOT NULL,
     location varchar(20),
-    protocol varchar(20),
+    protocol varchar(20) NOT NULL,
     alias varchar(20)
 );
