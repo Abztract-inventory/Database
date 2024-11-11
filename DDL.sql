@@ -78,6 +78,15 @@ CREATE TABLE rel_product_attribute(
 CREATE INDEX rel_product_attribute_productId ON rel_product_attribute(productId);
 CREATE INDEX rel_product_attribute_attributeId ON rel_product_attribute(attributeId)
 
+CREATE TABLE tbl_label(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    label varchar(50)
+);
+
+CREATE INDEX tbl_label_label ON tbl_label(label);
+
 CREATE TABLE tbl_product(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
@@ -87,8 +96,6 @@ CREATE TABLE tbl_product(
     documentNumber varchar(30),
     supplierNumber varchar(30),
     materialId int NOT NULL REFERENCES cat_material,
-    quantity float,
-    unitValue float,
     grammage float,
     width float,
     length float,
@@ -100,7 +107,9 @@ CREATE TABLE tbl_product(
     currencyId int NOT NULL REFERENCES cat_currency,
     exchangeRate float,
     specificAttribute varchar(MAX),
-    manufacturerId int NOT NULL REFERENCES cat_manufacturer
+    manufacturerId int NOT NULL REFERENCES cat_manufacturer,
+    -- labelId int NOT NULL REFERENCES tbl_label
+    labelId int REFERENCES tbl_label
 );
 
 CREATE INDEX tbl_product_productId ON tbl_product(productId);
@@ -121,13 +130,63 @@ CREATE TABLE tbl_value(
 CREATE INDEX tbl_value_attributeId ON tbl_value(attributeId);
 CREATE INDEX tbl_value_productId ON tbl_value(productId);
 
+CREATE TABLE tbl_location(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    principalModified varchar(100),
+    nave varchar(100),
+    section varchar(100),
+    comment varchar(250),
+);
+
 CREATE TABLE tbl_printers(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     ip varchar(15) NOT NULL,
     model varchar(20) NOT NULL,
-    location varchar(20),
+    locationId int NO NULL REFERENCES tbl_location,
     protocol varchar(20) NOT NULL,
     alias varchar(20)
 );
+
+CREATE TABLE cat_machine(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    principalModified varchar(100),
+    locationId int NO NULL REFERENCES tbl_location,
+    machine varchar(150)
+);
+
+CREATE TABLE tbl_production_batch(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    machineId int NO NULL REFERENCES cat_machine,
+);
+
+CREATE TABLE his_product_movement(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    principalModified varchar(100),
+    labelId int NOT NULL REFERENCES tbl_label,
+    quantity float,
+    unitValue float,
+    reason varchar(500),
+    inFlag bit,
+    batchId int NOT NULL REFERENCES tbl_production_batch
+);
+
+CREATE TABLE rel_location_label(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    locationId int NOT NULL REFERENCES tbl_location
+    labelId int NOT NULL REFERENCES tbl_label
+);
+
+CREATE INDEX rel_location_label_locationId ON rel_location_label(locationId);
+CREATE INDEX rel_location_label_labelId ON rel_location_label(labelId);
