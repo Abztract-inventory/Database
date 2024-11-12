@@ -22,9 +22,12 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
+            DECLARE @newId TABLE(id INT);
             INSERT INTO cat_machine (dateCreated, dateModified, principalModified, locationId, machine)
-            OUTPUT INSERTED.id INTO @idOut
+            OUTPUT INSERTED.id INTO @newId
             VALUES (GETDATE(), GETDATE(), @principalModified, @locationId, @machine);
+
+            SELECT TOP 1 @idOut = id FROM @newId;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
@@ -124,8 +127,7 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
-            UPDATE cat_machine
-            SET status = 0
+            DELETE FROM cat_machine
             WHERE id = @id;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;

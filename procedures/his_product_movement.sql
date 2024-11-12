@@ -29,9 +29,13 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
+            DECLARE @InsertedId TABLE (id INT);
+            
             INSERT INTO his_product_movement (dateCreated, dateModified, principalModified, labelId, quantity, unitValue, reason, inFlag, batchId)
-            OUTPUT INSERTED.id INTO @idOut
+            OUTPUT INSERTED.id INTO @InsertedId
             VALUES (GETDATE(), GETDATE(), @principalModified, @labelId, @quantity, @unitValue, @reason, @inFlag, @batchId);
+            
+            SELECT @idOut = id FROM @InsertedId;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
@@ -137,13 +141,9 @@ BEGIN
 
         DECLARE @errors VARCHAR(MAX);
 
-        IF NOT EXISTS (SELECT id FROM his_product_movement WHERE id = @id)
-            SET @errors = CONCAT(@errors, 'Movimiento de producto no encontrado: ', @id, CHAR(13), CHAR(10));
-
-        IF @errors IS NULL
+        IF EXISTS (SELECT id FROM his_product_movement WHERE id = @id)
         BEGIN
-            UPDATE his_product_movement
-            SET status = 0
+            DELETE FROM his_product_movement
             WHERE id = @id;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
