@@ -20,6 +20,7 @@ BEGIN
             SAVE TRANSACTION [create_his_product_movement];
 
         DECLARE @errors VARCHAR(MAX);
+		DECLARE @id TABLE(id int);
 
         IF NOT EXISTS (SELECT id FROM tbl_label WHERE id = @labelId)
             SET @errors = CONCAT(@errors, 'Etiqueta no encontrada, id: ', @labelId, CHAR(13), CHAR(10));
@@ -30,9 +31,9 @@ BEGIN
         IF @errors IS NULL
         BEGIN
             INSERT INTO his_product_movement (dateCreated, dateModified, principalModified, labelId, quantity, unitValue, reason, inFlag, batchId)
-            OUTPUT INSERTED.id INTO @idOut
+            OUTPUT INSERTED.id INTO @id
             VALUES (GETDATE(), GETDATE(), @principalModified, @labelId, @quantity, @unitValue, @reason, @inFlag, @batchId);
-
+			SELECT TOP 1 @idOut = id FROM @id
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
         ELSE
@@ -142,8 +143,7 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
-            UPDATE his_product_movement
-            SET status = 0
+            DELETE FROM his_product_movement
             WHERE id = @id;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
