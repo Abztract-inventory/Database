@@ -16,16 +16,19 @@ BEGIN
             SAVE TRANSACTION [create_cat_machine];
 
         DECLARE @errors VARCHAR(MAX);
+		DECLARE @id TABLE(id int);
 
         IF NOT EXISTS (SELECT id FROM tbl_location WHERE id = @locationId)
             SET @errors = CONCAT(@errors, 'Ubicación no encontrada, id: ', @locationId, CHAR(13), CHAR(10));
 
         IF @errors IS NULL
         BEGIN
-            INSERT INTO cat_machine (dateCreated, dateModified, principalModified, locationId, machine)
-            OUTPUT INSERTED.id INTO @idOut
-            VALUES (GETDATE(), GETDATE(), @principalModified, @locationId, @machine);
-
+            INSERT INTO 
+				cat_machine (dateCreated, dateModified, principalModified, locationId, machine)
+            OUTPUT INSERTED.id INTO @id
+            VALUES 
+				(GETDATE(), GETDATE(), @principalModified, @locationId, @machine);
+			SELECT TOP 1 @idOut = id FROM @id
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
         ELSE
@@ -124,9 +127,10 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
-            UPDATE cat_machine
-            SET status = 0
-            WHERE id = @id;
+            DELETE FROM 
+				cat_machine
+            WHERE 
+				id = @id;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END

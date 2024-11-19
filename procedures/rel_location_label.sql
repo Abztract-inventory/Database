@@ -15,6 +15,7 @@ BEGIN
             SAVE TRANSACTION [create_rel_location_label];
 
         DECLARE @errors VARCHAR(MAX);
+		DECLARE @id TABLE(id int);
 
         IF EXISTS(SELECT id FROM rel_location_label WHERE locationId = @locationId AND labelId = @labelId)
             SET @errors = CONCAT(@errors, 'Relación ya registrada.', CHAR(13), CHAR(10));
@@ -28,9 +29,9 @@ BEGIN
         IF @errors IS NULL
         BEGIN
             INSERT INTO rel_location_label (dateCreated, dateModified, locationId, labelId)
-            OUTPUT INSERTED.id INTO @idOut
+            OUTPUT INSERTED.id INTO @id
             VALUES (GETDATE(), GETDATE(), @locationId, @labelId);
-
+			SELECT TOP 1 @idOut = id FROM @id
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
         ELSE

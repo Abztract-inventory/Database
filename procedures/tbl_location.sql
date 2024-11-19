@@ -17,13 +17,14 @@ BEGIN
             SAVE TRANSACTION [create_tbl_location];
 
         DECLARE @errors VARCHAR(MAX);
+		DECLARE @id TABLE(id int);
 
         IF @errors IS NULL
         BEGIN
             INSERT INTO tbl_location (dateCreated, dateModified, principalModified, nave, section, comment)
-            OUTPUT INSERTED.id INTO @idOut
+            OUTPUT INSERTED.id INTO @id
             VALUES (GETDATE(), GETDATE(), @principalModified, @nave, @section, @comment);
-
+			SELECT TOP 1 @idOut = id FROM @id
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
         ELSE
@@ -121,8 +122,7 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
-            UPDATE tbl_location
-            SET status = 0
+            DELETE FROM tbl_location
             WHERE id = @id;
             
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;

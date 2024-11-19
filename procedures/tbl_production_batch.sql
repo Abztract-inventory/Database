@@ -14,6 +14,7 @@ BEGIN
             SAVE TRANSACTION [create_tbl_production_batch];
 
         DECLARE @errors VARCHAR(MAX);
+		DECLARE @id TABLE(id int);
 
         IF NOT EXISTS (SELECT id FROM cat_machine WHERE id = @machineId)
             SET @errors = CONCAT(@errors, 'Máquina no encontrada, id: ', @machineId, CHAR(13), CHAR(10));
@@ -21,9 +22,9 @@ BEGIN
         IF @errors IS NULL
         BEGIN
             INSERT INTO tbl_production_batch (dateCreated, dateModified, machineId)
-            OUTPUT INSERTED.id INTO @idOut
+            OUTPUT INSERTED.id INTO @id
             VALUES (GETDATE(), GETDATE(), @machineId);
-
+			SELECT TOP 1 @idOut = id FROM @id
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
         END
         ELSE
@@ -118,8 +119,7 @@ BEGIN
 
         IF @errors IS NULL
         BEGIN
-            UPDATE tbl_production_batch
-            SET status = 0
+            DELETE FROM tbl_production_batch
             WHERE id = @id;
 
             SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
