@@ -1,5 +1,3 @@
---tbl_product.sql
---create
 CREATE OR ALTER PROCEDURE [dbo].[create_tbl_product]
     @catProductId int, --cat_product
     @documentNumber varchar(30),
@@ -19,6 +17,7 @@ CREATE OR ALTER PROCEDURE [dbo].[create_tbl_product]
     @exchangeRate float,
     @specificAttribute varchar(MAX),
     @manufacturerId int,
+    @labelId int = NULL, -- Nuevo campo
     @idOut int = NULL OUTPUT
 AS
     SET NOCOUNT ON;
@@ -48,6 +47,9 @@ BEGIN
             IF NOT EXISTS(SELECT id FROM cat_manufacturer WHERE id = @manufacturerId)
                 SET @errors = CONCAT(@errors, 'Fabricante no encontrado.', CHAR(13), CHAR(10));
 
+            IF NOT EXISTS(SELECT id FROM tbl_label WHERE id = @labelId)
+                SET @errors = CONCAT(@errors, 'Etiqueta no encontrada.', CHAR(13), CHAR(10));
+
             IF(@errors IS NULL)
                 BEGIN
                     INSERT INTO 
@@ -72,7 +74,8 @@ BEGIN
                             currencyId, 
                             exchangeRate, 
                             specificAttribute, 
-                            manufacturerId
+                            manufacturerId,
+                            labelId -- Nuevo campo
                         )
                     OUTPUT inserted.id INTO @id
                     VALUES 
@@ -97,7 +100,8 @@ BEGIN
                             @currencyId, 
                             @exchangeRate, 
                             @specificAttribute, 
-                            @manufacturerId    
+                            @manufacturerId,
+                            @labelId -- Nuevo campo
                         )
                     SELECT TOP 1 @idOut = id FROM @id
                     SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
@@ -145,6 +149,7 @@ CREATE OR ALTER PROCEDURE [dbo].[update_tbl_product]
     @exchangeRate float,
     @specificAttribute varchar(MAX),
     @manufacturerId int,
+    @labelId int = NULL, -- Nuevo campo
     @idOut int = NULL OUTPUT
 AS
     SET NOCOUNT ON;
@@ -176,6 +181,9 @@ BEGIN
 
             IF (@manufacturerId IS NOT NULL) AND NOT EXISTS(SELECT id FROM cat_manufacturer WHERE id = @manufacturerId)
                 SET @errors = CONCAT(@errors, 'Fabricante no encontrado.', CHAR(13), CHAR(10));
+            
+            IF (@labelId IS NOT NULL) AND NOT EXISTS(SELECT id FROM tbl_label WHERE id = @labelId)
+                SET @errors = CONCAT(@errors, 'Etiqueta no encontrada.', CHAR(13), CHAR(10));
 
             IF(@errors IS NULL)
                 BEGIN
@@ -200,7 +208,8 @@ BEGIN
                         currencyId = COALESCE(@currencyId, currencyId),
                         exchangeRate = COALESCE(@exchangeRate, exchangeRate),
                         specificAttribute = COALESCE(@specificAttribute, specificAttribute),
-                        manufacturerId = COALESCE(@manufacturerId, manufacturerId)
+                        manufacturerId = COALESCE(@manufacturerId, manufacturerId),
+                        labelId = COALESCE(@labelId, labelId) -- Nuevo campo
                     WHERE 
                         id = @productId;
 
