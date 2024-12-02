@@ -190,3 +190,11 @@ CREATE TABLE rel_location_label(
 
 CREATE INDEX rel_location_label_locationId ON rel_location_label(locationId);
 CREATE INDEX rel_location_label_labelId ON rel_location_label(labelId);
+
+CREATE TABLE user(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    username varchar(50) UNIQUE NOT NULL,
+    passwordHash varchar(255) NOT NULL
+);
