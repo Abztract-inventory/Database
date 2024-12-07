@@ -76,7 +76,7 @@ CREATE TABLE rel_product_attribute(
 );
 
 CREATE INDEX rel_product_attribute_productId ON rel_product_attribute(productId);
-CREATE INDEX rel_product_attribute_attributeId ON rel_product_attribute(attributeId)
+CREATE INDEX rel_product_attribute_attributeId ON rel_product_attribute(attributeId);
 
 CREATE TABLE tbl_label(
     id int identity (1,1) PRIMARY KEY,
@@ -137,7 +137,7 @@ CREATE TABLE tbl_location(
     principalModified varchar(100),
     nave varchar(100),
     section varchar(100),
-    comment varchar(250),
+    comment varchar(250)
 );
 
 CREATE TABLE tbl_printers(
@@ -146,7 +146,7 @@ CREATE TABLE tbl_printers(
     dateModified datetime,
     ip varchar(15) NOT NULL,
     model varchar(20) NOT NULL,
-    locationId int NO NULL REFERENCES tbl_location,
+    locationId int NOT NULL REFERENCES tbl_location,
     protocol varchar(20) NOT NULL,
     alias varchar(20)
 );
@@ -156,7 +156,7 @@ CREATE TABLE cat_machine(
     dateCreated datetime,
     dateModified datetime,
     principalModified varchar(100),
-    locationId int NO NULL REFERENCES tbl_location,
+    locationId int NOT NULL REFERENCES tbl_location,
     machine varchar(150)
 );
 
@@ -164,7 +164,7 @@ CREATE TABLE tbl_production_batch(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    machineId int NO NULL REFERENCES cat_machine,
+    machineId int NOT NULL REFERENCES cat_machine
 );
 
 CREATE TABLE his_product_movement(
@@ -184,14 +184,14 @@ CREATE TABLE rel_location_label(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    locationId int NOT NULL REFERENCES tbl_location
+    locationId int NOT NULL REFERENCES tbl_location,
     labelId int NOT NULL REFERENCES tbl_label
 );
 
 CREATE INDEX rel_location_label_locationId ON rel_location_label(locationId);
 CREATE INDEX rel_location_label_labelId ON rel_location_label(labelId);
 
-CREATE TABLE user(
+CREATE TABLE tbl_user(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
