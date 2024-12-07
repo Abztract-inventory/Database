@@ -60,10 +60,10 @@ CREATE TABLE cat_product
     name varchar(100),
     unitsName varchar(50),
     isSet bit,
-    --statusId int NOT NULL REFERENCES cat_status
+    -- statusId int NOT NULL REFERENCES cat_status
 );
 
-CREATE INDEX cat_product_statusId ON cat_product(statusId);
+-- CREATE INDEX cat_product_statusId ON cat_product(statusId);
 
 CREATE TABLE tbl_attribute
 (
