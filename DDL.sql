@@ -159,10 +159,12 @@ CREATE TABLE tbl_printers
     dateModified datetime,
     ip varchar(15) NOT NULL,
     model varchar(20) NOT NULL,
-    locationId int NOT NULL REFERENCES tbl_location,
+    locationId int REFERENCES tbl_location,
     protocol varchar(20) NOT NULL,
     alias varchar(20)
 );
+
+CREATE INDEX tbl_printers_locationId ON tbl_printers(locationId);
 
 CREATE TABLE cat_machine
 (
