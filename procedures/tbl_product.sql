@@ -57,9 +57,9 @@ BEGIN
     WHERE id = @manufacturerId)
                 SET @errors = CONCAT(@errors, 'Fabricante no encontrado.', CHAR(13), CHAR(10));
 
-            IF NOT EXISTS(SELECT id
-    FROM tbl_label
-    WHERE id = @labelId)
+            IF (@labelId IS NOT NULL) AND NOT EXISTS(SELECT id
+        FROM tbl_label
+        WHERE id = @labelId)
                 SET @errors = CONCAT(@errors, 'Etiqueta no encontrada.', CHAR(13), CHAR(10));
 
             IF(@errors IS NULL)
