@@ -91,7 +91,7 @@ CREATE TABLE tbl_label
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    label varchar(50)
+    label varchar(50) UNIQUE
 );
 
 CREATE INDEX tbl_label_label ON tbl_label(label);
