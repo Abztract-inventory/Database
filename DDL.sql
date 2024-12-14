@@ -118,7 +118,6 @@ CREATE TABLE tbl_product
     exchangeRate float,
     specificAttribute varchar(MAX),
     manufacturerId int NOT NULL REFERENCES cat_manufacturer,
-    -- labelId int NOT NULL REFERENCES tbl_label
     labelId int REFERENCES tbl_label
 );
 
@@ -127,6 +126,7 @@ CREATE INDEX tbl_product_materialId ON tbl_product(materialId);
 CREATE INDEX tbl_product_companyId ON tbl_product(companyId);
 CREATE INDEX tbl_product_currencyId ON tbl_product(currencyId);
 CREATE INDEX tbl_product_manufacturerId ON tbl_product(manufacturerId);
+CREATE INDEX tbl_product_labelId ON tbl_product(labelId);
 
 CREATE TABLE tbl_value
 (
