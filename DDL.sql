@@ -195,7 +195,7 @@ CREATE TABLE his_product_movement
     unitValue float,
     reason varchar(500),
     inFlag bit,
-    batchId int NOT NULL REFERENCES tbl_production_batch
+    batchId int REFERENCES tbl_production_batch
 );
 
 CREATE TABLE rel_location_label

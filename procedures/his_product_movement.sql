@@ -22,20 +22,28 @@ BEGIN
         DECLARE @errors VARCHAR(MAX);
 		DECLARE @id TABLE(id int);
 
-        IF NOT EXISTS (SELECT id FROM tbl_label WHERE id = @labelId)
+        IF NOT EXISTS (SELECT id
+    FROM tbl_label
+    WHERE id = @labelId)
             SET @errors = CONCAT(@errors, 'Etiqueta no encontrada, id: ', @labelId, CHAR(13), CHAR(10));
 
-        IF NOT EXISTS (SELECT id FROM tbl_production_batch WHERE id = @batchId)
+        IF (@batchId IS NOT NULL) AND NOT EXISTS (SELECT id
+        FROM tbl_production_batch
+        WHERE id = @batchId)
             SET @errors = CONCAT(@errors, 'Lote de producción no encontrado, id: ', @batchId, CHAR(13), CHAR(10));
 
         IF @errors IS NULL
         BEGIN
-            INSERT INTO his_product_movement (dateCreated, dateModified, principalModified, labelId, quantity, unitValue, reason, inFlag, batchId)
-            OUTPUT INSERTED.id INTO @id
-            VALUES (GETDATE(), GETDATE(), @principalModified, @labelId, @quantity, @unitValue, @reason, @inFlag, @batchId);
-			SELECT TOP 1 @idOut = id FROM @id
-            SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
-        END
+        INSERT INTO his_product_movement
+            (dateCreated, dateModified, principalModified, labelId, quantity, unitValue, reason, inFlag, batchId)
+        OUTPUT INSERTED.id INTO @id
+        VALUES
+            (GETDATE(), GETDATE(), @principalModified, @labelId, @quantity, @unitValue, @reason, @inFlag, @batchId);
+        SELECT TOP 1
+            @idOut = id
+        FROM @id
+        SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
+    END
         ELSE
             SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
 
@@ -78,18 +86,24 @@ BEGIN
 
         DECLARE @errors VARCHAR(MAX);
 
-        IF NOT EXISTS (SELECT id FROM his_product_movement WHERE id = @id)
+        IF NOT EXISTS (SELECT id
+    FROM his_product_movement
+    WHERE id = @id)
             SET @errors = CONCAT(@errors, 'Movimiento de producto no encontrado, id: ', @id, CHAR(13), CHAR(10));
 
-        IF (@labelId IS NOT NULL) AND NOT EXISTS (SELECT id FROM tbl_label WHERE id = @labelId)
+        IF (@labelId IS NOT NULL) AND NOT EXISTS (SELECT id
+        FROM tbl_label
+        WHERE id = @labelId)
             SET @errors = CONCAT(@errors, 'Etiqueta no encontrada, id: ', @labelId, CHAR(13), CHAR(10));
 
-        IF (@batchId IS NOT NULL) AND NOT EXISTS (SELECT id FROM tbl_production_batch WHERE id = @batchId)
+        IF (@batchId IS NOT NULL) AND NOT EXISTS (SELECT id
+        FROM tbl_production_batch
+        WHERE id = @batchId)
             SET @errors = CONCAT(@errors, 'Lote de producción no encontrado, id: ', @batchId, CHAR(13), CHAR(10));
 
         IF @errors IS NULL
         BEGIN
-            UPDATE his_product_movement
+        UPDATE his_product_movement
             SET
                 dateModified = GETDATE(),
                 principalModified = COALESCE(@principalModified, principalModified),
@@ -101,8 +115,8 @@ BEGIN
                 batchId = COALESCE(@batchId, batchId)
             WHERE id = @id;
 
-            SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
-        END
+        SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
+    END
         ELSE
             SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
 
@@ -138,16 +152,18 @@ BEGIN
 
         DECLARE @errors VARCHAR(MAX);
 
-        IF NOT EXISTS (SELECT id FROM his_product_movement WHERE id = @id)
+        IF NOT EXISTS (SELECT id
+    FROM his_product_movement
+    WHERE id = @id)
             SET @errors = CONCAT(@errors, 'Movimiento de producto no encontrado: ', @id, CHAR(13), CHAR(10));
 
         IF @errors IS NULL
         BEGIN
-            DELETE FROM his_product_movement
+        DELETE FROM his_product_movement
             WHERE id = @id;
 
-            SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
-        END
+        SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
+    END
         ELSE
             SELECT 0 AS affects_rows, @errors AS error, @idOut AS id;
 
