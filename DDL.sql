@@ -190,7 +190,7 @@ CREATE TABLE his_product_movement
     dateCreated datetime,
     dateModified datetime,
     principalModified varchar(100),
-    labelId int NOT NULL UNIQUE REFERENCES tbl_label,
+    labelId int NOT NULL REFERENCES tbl_label,
     quantity float,
     unitValue float,
     reason varchar(500),
@@ -204,7 +204,7 @@ CREATE TABLE rel_location_label
     dateCreated datetime,
     dateModified datetime,
     locationId int NOT NULL REFERENCES tbl_location,
-    labelId int NOT NULL UNIQUE REFERENCES tbl_label
+    labelId int NOT NULL REFERENCES tbl_label
 );
 
 CREATE INDEX rel_location_label_locationId ON rel_location_label(locationId);
