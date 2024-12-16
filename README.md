@@ -37,12 +37,17 @@ You can verify the table status using:
 USE abztract
 GO
 ```
+
 ```
 SELECT TABLE_NAME
 FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_TYPE = 'BASE TABLE';
 GO
 ```
+
+### 3.2 Execute the Stored Procedures
+
+Run the SQL commands in the `procedures` directory to create the stored procedures. These procedures encapsulate the business logic and can be called from the application or directly from the database.
 
 ## 4. Configure hasura
 

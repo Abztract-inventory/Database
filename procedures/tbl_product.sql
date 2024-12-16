@@ -1,6 +1,5 @@
 CREATE OR ALTER PROCEDURE [dbo].[create_tbl_product]
     @catProductId int,
-    --cat_product
     @documentNumber varchar(30),
     @supplierNumber varchar(30),
     @materialId int,
@@ -16,8 +15,7 @@ CREATE OR ALTER PROCEDURE [dbo].[create_tbl_product]
     @exchangeRate float,
     @specificAttribute varchar(MAX),
     @manufacturerId int,
-    @labelId int = NULL,
-    -- Nuevo campo
+    @labelId int,
     @idOut int = NULL OUTPUT
 AS
 SET NOCOUNT ON;
@@ -57,10 +55,15 @@ BEGIN
     WHERE id = @manufacturerId)
                 SET @errors = CONCAT(@errors, 'Fabricante no encontrado.', CHAR(13), CHAR(10));
 
-            IF (@labelId IS NOT NULL) AND NOT EXISTS(SELECT id
-        FROM tbl_label
-        WHERE id = @labelId)
+            IF NOT EXISTS(SELECT id
+    FROM tbl_label
+    WHERE id = @labelId)
                 SET @errors = CONCAT(@errors, 'Etiqueta no encontrada.', CHAR(13), CHAR(10));
+                
+            IF EXISTS(SELECT id
+    FROM tbl_product
+    WHERE labelId = @labelId)
+                SET @errors = CONCAT(@errors, 'Etiqueta ya está asignada a otro producto.', CHAR(13), CHAR(10));
 
             IF(@errors IS NULL)
                 BEGIN
@@ -110,7 +113,7 @@ BEGIN
                 @exchangeRate,
                 @specificAttribute,
                 @manufacturerId,
-                @labelId -- Nuevo campo
+                @labelId
                         )
         SELECT TOP 1
             @idOut = id
@@ -143,7 +146,6 @@ GO
 CREATE OR ALTER PROCEDURE [dbo].[update_tbl_product]
     @productId int,
     @catProductId int,
-    --cat_product
     @documentNumber varchar(30),
     @supplierNumber varchar(30),
     @materialId int,
@@ -159,7 +161,7 @@ CREATE OR ALTER PROCEDURE [dbo].[update_tbl_product]
     @exchangeRate float,
     @specificAttribute varchar(MAX),
     @manufacturerId int,
-    @labelId int = NULL,
+    @labelId int,
     @idOut int = NULL OUTPUT
 AS
 SET NOCOUNT ON;
@@ -204,10 +206,15 @@ BEGIN
         WHERE id = @manufacturerId)
                 SET @errors = CONCAT(@errors, 'Fabricante no encontrado.', CHAR(13), CHAR(10));
             
-            IF (@labelId IS NOT NULL) AND NOT EXISTS(SELECT id
-        FROM tbl_label
-        WHERE id = @labelId)
+            IF NOT EXISTS(SELECT id
+    FROM tbl_label
+    WHERE id = @labelId)
                 SET @errors = CONCAT(@errors, 'Etiqueta no encontrada.', CHAR(13), CHAR(10));
+                
+            IF EXISTS(SELECT id
+    FROM tbl_product
+    WHERE labelId = @labelId AND id <> @productId)
+                SET @errors = CONCAT(@errors, 'Etiqueta ya está asignada a otro producto.', CHAR(13), CHAR(10));
 
             IF(@errors IS NULL)
                 BEGIN
@@ -231,7 +238,7 @@ BEGIN
                         exchangeRate = COALESCE(@exchangeRate, exchangeRate),
                         specificAttribute = COALESCE(@specificAttribute, specificAttribute),
                         manufacturerId = COALESCE(@manufacturerId, manufacturerId),
-                        labelId = COALESCE(@labelId, labelId) -- Nuevo campo
+                        labelId = COALESCE(@labelId, labelId)
                     WHERE 
                         id = @productId;
 
