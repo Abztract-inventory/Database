@@ -96,7 +96,7 @@ BEGIN
         WHERE id = @labelId)
             SET @errors = CONCAT(@errors, 'Etiqueta no encontrada, id: ', @labelId, CHAR(13), CHAR(10));
 
-        IF (@batchId IS NOT NULL) AND NOT EXISTS (SELECT id
+        IF (@batchId IS NOT NULL ) AND (@batchId <> -1) AND NOT EXISTS (SELECT id
         FROM tbl_production_batch
         WHERE id = @batchId)
             SET @errors = CONCAT(@errors, 'Lote de producción no encontrado, id: ', @batchId, CHAR(13), CHAR(10));
@@ -112,7 +112,7 @@ BEGIN
                 unitValue = COALESCE(@unitValue, unitValue),
                 reason = COALESCE(@reason, reason),
                 inFlag = COALESCE(@inFlag, inFlag),
-                batchId = COALESCE(@batchId, batchId)
+                batchId = CASE WHEN @batchId = -1 THEN NULL ELSE COALESCE(@batchId, batchId) END
             WHERE id = @id;
 
         SELECT 1 AS affects_rows, NULL AS error, @idOut AS id;
