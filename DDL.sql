@@ -1,6 +1,6 @@
 --DDL.sql
 CREATE DATABASE abztract;
-GO 
+GO
 
 USE abztract;
 GO
@@ -11,42 +11,48 @@ GO
 --     dateModified datetime,
 -- );
 
-CREATE TABLE cat_status(
+CREATE TABLE cat_status
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     name varchar(100)
 );
 
-CREATE TABLE cat_material(
+CREATE TABLE cat_material
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     name varchar(100)
 );
 
-CREATE TABLE cat_company(
+CREATE TABLE cat_company
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     name varchar(100)
 );
 
-CREATE TABLE cat_currency(
+CREATE TABLE cat_currency
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     name varchar(100)
 );
 
-CREATE TABLE cat_manufacturer(
+CREATE TABLE cat_manufacturer
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     name varchar(100)
 );
 
-CREATE TABLE cat_product(
+CREATE TABLE cat_product
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
@@ -54,12 +60,13 @@ CREATE TABLE cat_product(
     name varchar(100),
     unitsName varchar(50),
     isSet bit,
-    statusId int NOT NULL REFERENCES cat_status
+    -- statusId int NOT NULL REFERENCES cat_status
 );
 
-CREATE INDEX cat_product_statusId ON cat_product(statusId);
+-- CREATE INDEX cat_product_statusId ON cat_product(statusId);
 
-CREATE TABLE tbl_attribute(
+CREATE TABLE tbl_attribute
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
@@ -67,7 +74,8 @@ CREATE TABLE tbl_attribute(
     type varchar(20)
 );
 
-CREATE TABLE rel_product_attribute(
+CREATE TABLE rel_product_attribute
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
@@ -76,18 +84,20 @@ CREATE TABLE rel_product_attribute(
 );
 
 CREATE INDEX rel_product_attribute_productId ON rel_product_attribute(productId);
-CREATE INDEX rel_product_attribute_attributeId ON rel_product_attribute(attributeId)
+CREATE INDEX rel_product_attribute_attributeId ON rel_product_attribute(attributeId);
 
-CREATE TABLE tbl_label(
+CREATE TABLE tbl_label
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    label varchar(50)
+    label varchar(50) UNIQUE
 );
 
 CREATE INDEX tbl_label_label ON tbl_label(label);
 
-CREATE TABLE tbl_product(
+CREATE TABLE tbl_product
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
@@ -108,8 +118,7 @@ CREATE TABLE tbl_product(
     exchangeRate float,
     specificAttribute varchar(MAX),
     manufacturerId int NOT NULL REFERENCES cat_manufacturer,
-    -- labelId int NOT NULL REFERENCES tbl_label
-    labelId int REFERENCES tbl_label
+    labelId int UNIQUE REFERENCES tbl_label
 );
 
 CREATE INDEX tbl_product_productId ON tbl_product(productId);
@@ -117,8 +126,10 @@ CREATE INDEX tbl_product_materialId ON tbl_product(materialId);
 CREATE INDEX tbl_product_companyId ON tbl_product(companyId);
 CREATE INDEX tbl_product_currencyId ON tbl_product(currencyId);
 CREATE INDEX tbl_product_manufacturerId ON tbl_product(manufacturerId);
+CREATE INDEX tbl_product_labelId ON tbl_product(labelId);
 
-CREATE TABLE tbl_value(
+CREATE TABLE tbl_value
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
@@ -130,44 +141,51 @@ CREATE TABLE tbl_value(
 CREATE INDEX tbl_value_attributeId ON tbl_value(attributeId);
 CREATE INDEX tbl_value_productId ON tbl_value(productId);
 
-CREATE TABLE tbl_location(
+CREATE TABLE tbl_location
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     principalModified varchar(100),
     nave varchar(100),
     section varchar(100),
-    comment varchar(250),
+    comment varchar(250)
 );
 
-CREATE TABLE tbl_printers(
+CREATE TABLE tbl_printers
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     ip varchar(15) NOT NULL,
     model varchar(20) NOT NULL,
-    locationId int NO NULL REFERENCES tbl_location,
+    locationId int REFERENCES tbl_location,
     protocol varchar(20) NOT NULL,
     alias varchar(20)
 );
 
-CREATE TABLE cat_machine(
+CREATE INDEX tbl_printers_locationId ON tbl_printers(locationId);
+
+CREATE TABLE cat_machine
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
     principalModified varchar(100),
-    locationId int NO NULL REFERENCES tbl_location,
+    locationId int NOT NULL REFERENCES tbl_location,
     machine varchar(150)
 );
 
-CREATE TABLE tbl_production_batch(
+CREATE TABLE tbl_production_batch
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    machineId int NO NULL REFERENCES cat_machine,
+    machineId int NOT NULL REFERENCES cat_machine
 );
 
-CREATE TABLE his_product_movement(
+CREATE TABLE his_product_movement
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
@@ -177,16 +195,26 @@ CREATE TABLE his_product_movement(
     unitValue float,
     reason varchar(500),
     inFlag bit,
-    batchId int NOT NULL REFERENCES tbl_production_batch
+    batchId int REFERENCES tbl_production_batch
 );
 
-CREATE TABLE rel_location_label(
+CREATE TABLE rel_location_label
+(
     id int identity (1,1) PRIMARY KEY,
     dateCreated datetime,
     dateModified datetime,
-    locationId int NOT NULL REFERENCES tbl_location
+    locationId int NOT NULL REFERENCES tbl_location,
     labelId int NOT NULL REFERENCES tbl_label
 );
 
 CREATE INDEX rel_location_label_locationId ON rel_location_label(locationId);
 CREATE INDEX rel_location_label_labelId ON rel_location_label(labelId);
+
+CREATE TABLE tbl_user
+(
+    id int identity (1,1) PRIMARY KEY,
+    dateCreated datetime,
+    dateModified datetime,
+    username varchar(50) UNIQUE NOT NULL,
+    passwordHash varchar(255) NOT NULL
+);

@@ -17,8 +17,9 @@ BEGIN
         DECLARE @errors VARCHAR(MAX);
 		DECLARE @id TABLE(id int);
 
-        IF EXISTS(SELECT id FROM rel_location_label WHERE locationId = @locationId AND labelId = @labelId)
-            SET @errors = CONCAT(@errors, 'Relación ya registrada.', CHAR(13), CHAR(10));
+        -- Removed Restriction
+        -- IF EXISTS(SELECT id FROM rel_location_label WHERE locationId = @locationId AND labelId = @labelId)
+        --     SET @errors = CONCAT(@errors, 'Relación ya registrada.', CHAR(13), CHAR(10));
 
         IF NOT EXISTS (SELECT id FROM tbl_location WHERE id = @locationId)
             SET @errors = CONCAT(@errors, 'Ubicación no encontrada, id: ', @locationId, CHAR(13), CHAR(10));
